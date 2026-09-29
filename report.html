@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Vulnerability Scan Report — 10.10.10.10</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0F172A; color: #E2E8F0; margin: 0; padding: 40px; }
+  .container { max-width: 1050px; margin: 0 auto; }
+  h1 { font-size: 26px; margin-bottom: 4px; }
+  .subtitle { color: #94A3B8; margin-bottom: 8px; }
+  .nvdnote { color: #5EEAD4; font-size: 12.5px; margin-bottom: 24px; font-style: italic; }
+  .summary { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+  .card { background: #1E293B; border-radius: 10px; padding: 18px 24px; flex: 1; min-width: 160px; }
+  .card .label { font-size: 12px; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; }
+  .card .value { font-size: 28px; font-weight: bold; margin-top: 6px; }
+  .risk-card { background: #EA580C22; border: 1px solid #EA580C; }
+  .risk-card .value { color: #EA580C; }
+  table { width: 100%; border-collapse: collapse; background: #1E293B; border-radius: 10px; overflow: hidden; }
+  th { background: #0F172A; text-align: left; padding: 12px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #94A3B8; }
+  td { padding: 12px 14px; border-top: 1px solid #334155; font-size: 13.5px; }
+  tr.clean td { color: #64748B; }
+  .badge { color: white; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; white-space: nowrap; }
+  .srcbadge { color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; white-space: nowrap; }
+  footer { margin-top: 24px; color: #64748B; font-size: 12px; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Network Vulnerability Scan Report</h1>
+    <div class="subtitle">Target: 10.10.10.10 &nbsp;|&nbsp; Generated: 2026-09-28 00:53</div>
+    <div class="nvdnote">This scan used the local vulnerability database only (offline demo mode).</div>
+
+    <div class="summary">
+      <div class="card"><div class="label">Ports Scanned</div><div class="value">23</div></div>
+      <div class="card"><div class="label">Flagged Risky</div><div class="value">1</div></div>
+      <div class="card risk-card"><div class="label">Overall Risk Rating</div><div class="value">HIGH</div></div>
+    </div>
+
+    <table>
+      <tr>
+        <th>Host:Port</th><th>Service</th><th>Product/Version</th>
+        <th>Severity</th><th>CVE</th><th>Source</th><th>Description</th>
+      </tr>
+      
+            <tr>
+              <td>10.10.10.10:21</td>
+              <td>ftp</td>
+              <td>vsftpd 2.3.4</td>
+              <td><span class="badge" style="background:#DC2626">CRITICAL</span></td>
+              <td>CVE-2011-2523</td>
+              <td><span class="srcbadge" style="background:#64748B">LOCAL DB</span></td>
+              <td>Backdoor command execution in vsFTPd 2.3.4</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:22</td>
+              <td>ssh</td>
+              <td>OpenSSH 4.7p1 Debian 8ubuntu1</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:23</td>
+              <td>telnet</td>
+              <td>Linux telnetd </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:25</td>
+              <td>smtp</td>
+              <td>Postfix smtpd </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:53</td>
+              <td>domain</td>
+              <td>ISC BIND 9.4.2</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:80</td>
+              <td>http</td>
+              <td>Apache httpd 2.2.8</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:111</td>
+              <td>rpcbind</td>
+              <td> 2</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:139</td>
+              <td>netbios-ssn</td>
+              <td>Samba smbd 3.X - 4.X</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:445</td>
+              <td>netbios-ssn</td>
+              <td>Samba smbd 3.X - 4.X</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:512</td>
+              <td>exec</td>
+              <td>netkit-rsh rexecd </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:513</td>
+              <td>login</td>
+              <td> </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:514</td>
+              <td>shell</td>
+              <td>Netkit rshd </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:1099</td>
+              <td>java-rmi</td>
+              <td>GNU Classpath grmiregistry </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:1524</td>
+              <td>bindshell</td>
+              <td>Metasploitable root shell </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:2049</td>
+              <td>nfs</td>
+              <td> 2-4</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:2121</td>
+              <td>ftp</td>
+              <td>ProFTPD 1.3.1</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:3306</td>
+              <td>mysql</td>
+              <td>MySQL 5.0.51a-3ubuntu5</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:5432</td>
+              <td>postgresql</td>
+              <td>PostgreSQL DB 8.3.0 - 8.3.7</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:5900</td>
+              <td>vnc</td>
+              <td>VNC </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:6000</td>
+              <td>X11</td>
+              <td> </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:6667</td>
+              <td>irc</td>
+              <td>UnrealIRCd </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:8009</td>
+              <td>ajp13</td>
+              <td>Apache Jserv </td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+            <tr class="clean">
+              <td>10.10.10.10:8180</td>
+              <td>http</td>
+              <td>Apache Tomcat/Coyote JSP engine 1.1</td>
+              <td><span class="badge" style="background:#16A34A">CLEAN</span></td>
+              <td>—</td>
+              <td>—</td>
+              <td>No known vulnerability found</td>
+            </tr>
+    </table>
+
+    <footer>Generated by Automated Network Vulnerability Scanner — Praveen, RR Institute of Technology</footer>
+  </div>
+</body>
+</html>
