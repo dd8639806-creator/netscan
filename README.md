@@ -52,8 +52,8 @@ Run `python3 netscan.py -h` to see all options.
 ## Report preview
 Add a screenshot of your `report.html` here:
 
-![HTML report](screenshots/report.png)
-
+![Sample HTML report](report.gng)
+*Sample report generated from 'sample_scan.xml' in offline demo mode.*
 ## Limitations
 - Version-based matching can give false positives, verify findings manually
 - Live NVD lookups need an internet connection
