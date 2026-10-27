@@ -6,13 +6,36 @@ Open:  http://127.0.0.1:5050
 Needs: pip3 install flask   (and netscan.py + risk.py in the same folder)
 """
 import ipaddress
+import json
 import socket
+from datetime import datetime
+from pathlib import Path
 
 from flask import Flask, jsonify, request
 
 import netscan
 
 app = Flask(__name__)
+HISTORY = Path(__file__).resolve().parent / "history.json"
+
+
+def compare_with_last(key, rows, top):
+    """Save this scan and compare it with the previous scan of the same target."""
+    current = {f"{r['host']}|{r['cve']}": f"{r['host']} {r['product']}"
+               for r in rows if r["severity"] != "CLEAN"}
+    try:
+        hist = json.loads(HISTORY.read_text())
+    except Exception:
+        hist = {}
+    prev = hist.get(key)
+    hist[key] = {"issues": current, "top": top,
+                 "time": datetime.now().strftime("%Y-%m-%d %H:%M")}
+    HISTORY.write_text(json.dumps(hist, indent=2))
+    if not prev:
+        return {"first": True}
+    return {"first": False, "time": prev["time"], "prev_top": prev["top"],
+            "new": [current[k] for k in current if k not in prev["issues"]],
+            "fixed": [prev["issues"][k] for k in prev["issues"] if k not in current]}
 
 
 def is_lab_target(target):
@@ -34,6 +57,7 @@ def scan():
     data = request.get_json(force=True)
     target = (data.get("target") or "").strip()
     demo = bool(data.get("demo"))
+    fixed = bool(data.get("fixed"))
     try:
         if demo:
             xml = netscan.load_demo_scan()
@@ -42,6 +66,10 @@ def scan():
                 return jsonify(error="Scan only your own lab machines (private IPs like 192.168.x.x)."), 400
             xml = netscan.run_nmap_scan(target)
         findings = netscan.parse_nmap_xml(xml)
+        if demo and fixed:  # rehearsal only: pretend FTP + Apache were patched
+            findings = [f for f in findings
+                        if "vsftpd" not in f["product"].lower()
+                        and "apache" not in f["product"].lower()]
         report = netscan.match_vulnerabilities(findings, netscan.load_vuln_db(), False)
         report = netscan.add_risk(report)
         rating, top = netscan.compute_risk_rating(report)
@@ -63,8 +91,9 @@ def scan():
             "fix": v["fix"] if v else "No action needed.",
             "exploit": bool(v and v.get("exploit")),
         })
+    cmp = compare_with_last("demo" if demo else target, rows, top)
     return jsonify(target="demo sample" if demo else target, rating=rating,
-                   top=top, counts=counts, rows=rows)
+                   top=top, counts=counts, rows=rows, compare=cmp)
 
 
 PAGE = """<!DOCTYPE html>
@@ -104,6 +133,7 @@ PAGE = """<!DOCTYPE html>
 <div class="bar">
  <input type="text" id="target" value="192.168.56.101" placeholder="Target IP">
  <label><input type="checkbox" id="demo" checked> Demo mode</label>
+ <label><input type="checkbox" id="fixed"> Simulate fix (demo only)</label>
  <button id="go">Start Scan</button>
 </div>
 <div id="msg"></div>
@@ -114,6 +144,7 @@ PAGE = """<!DOCTYPE html>
   <div class="card"><div class="label">Highest score</div><div class="value" id="c3"></div></div>
   <div class="card" id="rc"><div class="label">Overall risk</div><div class="value" id="c4"></div></div>
  </div>
+ <div class="panel" id="cmp" style="margin-bottom:18px"></div>
  <div class="row">
   <div class="panel"><h3>Severity mix</h3>
    <div class="donutwrap"><div id="donut"><div></div></div><div id="legend"></div></div></div>
@@ -133,7 +164,7 @@ $('go').onclick=async()=>{
   $('go').disabled=true; $('msg').textContent='Scanning... please wait';
   try{
     const r=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({target:$('target').value,demo:$('demo').checked})});
+      body:JSON.stringify({target:$('target').value,demo:$('demo').checked,fixed:$('fixed').checked})});
     const d=await r.json();
     if(!r.ok) throw new Error(d.error);
     render(d); $('msg').textContent='';
@@ -158,6 +189,15 @@ function render(d){
   $('donut').style.background='conic-gradient('+stops.join(',')+')';
   $('legend').innerHTML=lg;
 
+  const c=d.compare; let h='<h3>Since last scan</h3>';
+  if(c.first){ h+='First scan saved. Fix something, then scan again to see the change.'; }
+  else{
+    h+='Compared with scan at '+esc(c.time)+': score <b>'+c.prev_top+' &rarr; '+d.top+'</b>';
+    c.fixed.forEach(x=>{h+='<div class="lg" style="color:#86EFAC">FIXED: '+esc(x)+'</div>';});
+    c.new.forEach(x=>{h+='<div class="lg" style="color:#FCA5A5">NEW: '+esc(x)+'</div>';});
+    if(!c.fixed.length&&!c.new.length) h+='<div class="lg">No change since last scan.</div>';
+  }
+  $('cmp').innerHTML=h;
   $('needle').style.left='calc('+Math.min(d.top,100)+'% - 2px)';
   const f=d.rows[0];
   $('first').innerHTML=f&&f.score>0
