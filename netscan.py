@@ -29,6 +29,7 @@ from pathlib import Path
 from datetime import datetime
 
 import risk  # NEW: risk score + fix advice (risk.py must be in the same folder)
+import checks  # NEW: configuration checks (checks.py must be in the same folder)
 
 try:
     import requests
@@ -40,6 +41,7 @@ BASE_DIR = Path(__file__).resolve().parent
 VULN_DB_PATH = BASE_DIR / "vuln_db.json"
 SAMPLE_XML_PATH = BASE_DIR / "sample_scan.xml"
 REPORT_PATH = BASE_DIR / "report.html"
+CONFIG_CHECKS = True  # set to False automatically in demo mode
 
 NVD_API_URL = "https://services.nvd.nist.gov/rest/json/cves/2.0"
 NVD_DELAY_SECONDS = 6  # NVD's recommended delay between unauthenticated requests
@@ -60,6 +62,8 @@ def load_vuln_db():
 
 
 def run_nmap_scan(target):
+    global CONFIG_CHECKS
+    CONFIG_CHECKS = True
     print(f"[*] Scanning {target} with Nmap (-sV)...")
     result = subprocess.run(
         ["nmap", "-sV", "-oX", "-", target],
@@ -71,6 +75,8 @@ def run_nmap_scan(target):
 
 
 def load_demo_scan():
+    global CONFIG_CHECKS
+    CONFIG_CHECKS = False
     print("[*] DEMO MODE: loading sample_scan.xml (no live scan performed)")
     return SAMPLE_XML_PATH.read_text()
 
@@ -169,6 +175,8 @@ def match_vulnerabilities(findings, vuln_db, use_live_nvd):
 
         f["vulnerability"] = matched
         report.append(f)
+    if CONFIG_CHECKS:
+        report = checks.apply(report)
     return report
 
 
@@ -184,11 +192,12 @@ def add_risk(report):
             "version": r["version"],
             "severity": v["severity"],
         }
-        flat["exploit"] = risk.has_exploit(r["product"], r["version"])
+        is_config = v.get("source") == "config"
+        flat["exploit"] = False if is_config else risk.has_exploit(r["product"], r["version"])
         v["exploit"] = flat["exploit"]
         v["score"] = risk.score(flat)
-        # use our fix advice when we know the product, else keep the DB/NVD fix
-        if any(k in r["product"].lower() for k in risk.FIXES):
+        # use our fix advice when we know the product, else keep the DB/NVD/config fix
+        if not is_config and any(k in r["product"].lower() for k in risk.FIXES):
             v["fix"] = risk.fix_for(flat)
         r["score"] = v["score"]
     report.sort(key=lambda r: r["score"], reverse=True)
@@ -212,7 +221,7 @@ def print_report(report):
         print(line)
         if r["vulnerability"]:
             v = r["vulnerability"]
-            src = "local DB" if v.get("source") == "local" else "LIVE NVD"
+            src = {"local": "local DB", "config": "CONFIG CHECK"}.get(v.get("source"), "LIVE NVD")
             exploit = "  EXPLOIT AVAILABLE" if v.get("exploit") else ""
             print(f"    !! [{src}] {v['cve']} — {v['severity']} — score {v['score']}/100{exploit}")
             print(f"       {v['description']}")
@@ -240,8 +249,8 @@ def generate_html_report(report, target, used_live_nvd):
         if r["vulnerability"]:
             v = r["vulnerability"]
             color = SEVERITY_COLOR.get(v["severity"], "#65A30D")
-            src_badge = "LIVE NVD" if v.get("source") == "live NVD" else "LOCAL DB"
-            src_color = "#0D9488" if v.get("source") == "live NVD" else "#64748B"
+            src_badge = {"live NVD": "LIVE NVD", "config": "CONFIG"}.get(v.get("source"), "LOCAL DB")
+            src_color = {"live NVD": "#0D9488", "config": "#7C3AED"}.get(v.get("source"), "#64748B")
             exploit_tag = '<br><span class="exploit">EXPLOIT AVAILABLE</span>' if v.get("exploit") else ""
             rows += f"""
             <tr>
